@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PayCore — Enterprise Payroll</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#04050a;--bg1:#080c14;--bg2:#0d1220;--bg3:#111827;
+  --border:#1a2235;--border2:#243047;
+  --accent:#3b7bfc;--accent2:#5e9cff;--accent-glow:rgba(59,123,252,.15);
+  --green:#22d3a0;--green-bg:rgba(34,211,160,.08);--green-border:rgba(34,211,160,.2);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.08);
+  --rose:#fb4b6e;--rose-bg:rgba(251,75,110,.08);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,.08);
+  --text1:#e8edf8;--text2:#8896b0;--text3:#4a5568;
+  --sans:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{background:var(--bg0);color:var(--text1);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+
+/* ── animated grid bg ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(59,123,252,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,123,252,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(59,123,252,.07) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── layout ── */
+.wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:0 28px 80px}
+
+/* ── topbar ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 0;border-bottom:1px solid var(--border);
+  margin-bottom:36px;
+}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,#2563eb,#3b7bfc);
+  display:grid;place-items:center;
+  box-shadow:0 0 24px rgba(59,123,252,.4);
+}
+.brand-icon svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}
+.brand-name{font-size:1.25rem;font-weight:700;letter-spacing:-.03em;color:var(--text1)}
+.brand-name em{color:var(--accent2);font-style:normal}
+.brand-sub{font-size:.7rem;font-family:var(--mono);color:var(--text3);letter-spacing:.08em;margin-top:1px}
+.pill-live{
+  display:flex;align-items:center;gap:7px;
+  background:var(--green-bg);border:1px solid var(--green-border);
+  color:var(--green);padding:5px 12px;border-radius:99px;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;
+}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 4px var(--green)}50%{opacity:.3;box-shadow:none}}
+
+/* ── kpi row ── */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:36px}
+.kpi{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:20px 22px;position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
+  animation:fadeUp .5s ease both;
+}
+.kpi:hover{border-color:var(--border2);transform:translateY(-2px)}
+.kpi::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(59,123,252,.04) 0%,transparent 60%);
+  pointer-events:none;
+}
+.kpi-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.kpi-value{font-size:1.7rem;font-weight:700;letter-spacing:-.04em;color:var(--text1)}
+.kpi-value.accent{color:var(--accent2)}
+.kpi-sub{font-size:.7rem;color:var(--text3);margin-top:6px;font-family:var(--mono)}
+.kpi-icon{
+  position:absolute;right:18px;top:18px;
+  width:32px;height:32px;border-radius:8px;
+  display:grid;place-items:center;font-size:14px;
+}
+.kpi:nth-child(1) .kpi-icon{background:rgba(59,123,252,.1);color:var(--accent2)}
+.kpi:nth-child(2) .kpi-icon{background:var(--green-bg);color:var(--green)}
+.kpi:nth-child(3) .kpi-icon{background:var(--amber-bg);color:var(--amber)}
+.kpi:nth-child(4) .kpi-icon{background:var(--purple-bg);color:var(--purple)}
+
+/* ── section ── */
+.section{margin-bottom:32px;animation:fadeUp .5s ease both}
+.section:nth-child(3){animation-delay:.08s}
+.section:nth-child(4){animation-delay:.14s}
+.section:nth-child(5){animation-delay:.2s}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-label{
+  display:flex;align-items:center;gap:10px;
+  font-size:.68rem;font-family:var(--mono);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text2);font-weight:500;
+}
+.sec-label::before{
+  content:'';display:block;width:3px;height:14px;
+  background:var(--accent);border-radius:99px;
+  box-shadow:0 0 8px var(--accent);
+}
+.sec-badge{
+  font-family:var(--mono);font-size:.62rem;color:var(--text3);
+  background:var(--bg2);border:1px solid var(--border);
+  padding:3px 10px;border-radius:6px;
+}
+
+/* ── card / table ── */
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--bg2);border-bottom:1px solid var(--border)}
+th{
+  font-family:var(--mono);font-size:.6rem;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text3);
+  text-align:left;padding:13px 18px;white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(59,123,252,.04)}
+td{padding:13px 18px;font-size:.85rem;vertical-align:middle;white-space:nowrap}
+
+.num{font-family:var(--mono);text-align:right;font-size:.83rem}
+.muted{color:var(--text2)}
+.green{color:var(--green);font-family:var(--mono)}
+.amber{color:var(--amber)}
+
+/* dept badge */
+.tag{
+  display:inline-block;padding:3px 9px;border-radius:6px;
+  font-family:var(--mono);font-size:.68rem;font-weight:500;
+}
+.tag-blue{background:rgba(59,123,252,.1);color:#7aa8fd;border:1px solid rgba(59,123,252,.2)}
+.tag-gray{background:rgba(136,150,176,.08);color:var(--text2);border:1px solid var(--border)}
+
+/* bar */
+.bar-wrap{display:flex;align-items:center;gap:10px}
+.bar-bg{flex:1;max-width:120px;height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#2563eb,#3b7bfc);border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bar-pct{font-family:var(--mono);font-size:.75rem;min-width:38px;text-align:right;color:var(--text2)}
+
+/* crown */
+.crown{color:var(--amber);font-size:.85rem}
+
+/* ── state rows ── */
+.state td{padding:44px;text-align:center;font-family:var(--mono);font-size:.75rem;color:var(--text3)}
+.spin{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid var(--border2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .65s linear infinite;
+  vertical-align:middle;margin-right:8px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{color:var(--rose)}
+
+/* ── form ── */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;padding:22px}
+.fg{display:flex;flex-direction:column;gap:7px}
+label{font-family:var(--mono);font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+input,select{
+  background:var(--bg0);color:var(--text1);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:9px 13px;font-family:var(--mono);font-size:.8rem;
+  outline:none;width:100%;
+  transition:border-color .15s,box-shadow .15s;
+}
+input::placeholder{color:var(--text3)}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+select option{background:var(--bg2)}
+.form-foot{display:flex;align-items:center;gap:14px;padding:0 22px 22px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:8px;padding:10px 22px;
+  font-family:var(--sans);font-size:.82rem;font-weight:600;
+  cursor:pointer;letter-spacing:.01em;
+  transition:background .15s,box-shadow .15s,transform .1s;
+  position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);
+  pointer-events:none;
+}
+.btn:hover{background:#2563eb;box-shadow:0 0 24px rgba(59,123,252,.4)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+/* toast */
+.toast{
+  padding:9px 14px;border-radius:8px;
+  font-family:var(--mono);font-size:.72rem;
+  opacity:0;transition:opacity .25s;pointer-events:none;
+}
+.toast.show{opacity:1}
+.toast.ok{color:var(--green);background:var(--green-bg);border:1px solid var(--green-border)}
+.toast.fail{color:var(--rose);background:var(--rose-bg);border:1px solid rgba(251,75,110,.2)}
+
+/* ── footer ── */
+footer{
+  border-top:1px solid var(--border);padding:18px 0 0;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:.62rem;color:var(--text3);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+
+/* ── animations ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.kpi:nth-child(1){animation-delay:.03s}
+.kpi:nth-child(2){animation-delay:.07s}
+.kpi:nth-child(3){animation-delay:.11s}
+.kpi:nth-child(4){animation-delay:.15s}
+
+/* ── responsive ── */
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.kpis{grid-template-columns:1fr};.wrap{padding:0 14px 60px};.bar-bg{display:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Pay<em>Core</em></div>
+        <div class="brand-sub">Enterprise Payroll Intelligence</div>
+      </div>
+    </div>
+    <div class="pill-live"><span class="dot"></span>API Connected</div>
+  </div>
+
+  <!-- kpis -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-icon">$</div>
+      <div class="kpi-label">Total Payroll Cost</div>
+      <div class="kpi-value accent" id="k-total">—</div>
+      <div class="kpi-sub">Current cycle · all depts</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">⬡</div>
+      <div class="kpi-label">Departments</div>
+      <div class="kpi-value" id="k-depts">—</div>
+      <div class="kpi-sub">Active business units</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">♟</div>
+      <div class="kpi-label">Headcount</div>
+      <div class="kpi-value" id="k-heads">—</div>
+      <div class="kpi-sub">Employees on payroll</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">≈</div>
+      <div class="kpi-label">Avg Base Salary</div>
+      <div class="kpi-value" id="k-avg">—</div>
+      <div class="kpi-sub">Cross-department mean</div>
+    </div>
+  </div>
+
+  <!-- table 1 -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-label">Department Payroll Breakdown</div>
+      <div class="sec-badge">JOIN + GROUP BY</div>
+    </div>
+    <div class="card">
+      <div class="card-scroll">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Department</th><th>Headcount</th>
+            <th style="text-align:right">Avg Base</th>
+            <th style="text-align:right">Total Cost</th>
+            <th>Cost Share</th>
+          </tr></thead>
+          <tbody id="tb-dept">
+            <tr class="state"><td colspan="6"><span class="spin"></span>Fetching department data…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- table 2 -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-label">Top Earner Per Department</div>
+      <div class="sec-badge">ROW_NUMBER() OVER (PARTITION BY)</div>
+    </div>
+    <div class="card">
+      <div class="card-scroll">
+        <table>
+          <thead><tr>
+            <th>Rank</th><th>Name</th><th>Role</th><th>Department</th>
+            <th style="text-align:right">Base Salary</th>
+            <th style="text-align:right">Bonus</th>
+            <th style="text-align:right">Total Comp</th>
+          </tr></thead>
+          <tbody id="tb-top">
+            <tr class="state"><td colspan="7"><span class="spin"></span>Fetching top earners…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- form -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-label">Onboard New Employee</div>
+      <div class="sec-badge">POST · Atomic Transaction</div>
+    </div>
+    <div class="card">
+      <div class="form-grid">
+        <div class="fg"><label>Full Name</label><input id="f-name" type="text" placeholder="e.g. Jane Doe"/></div>
+        <div class="fg"><label>Job Title</label><input id="f-role" type="text" placeholder="e.g. Senior Engineer"/></div>
+        <div class="fg">
+          <label>Department</label>
+          <select id="f-dept"><option value="">— select —</option></select>
+        </div>
+        <div class="fg"><label>Base Salary (USD)</label><input id="f-sal" type="number" min="0" step="1000" placeholder="e.g. 120000"/></div>
+        <div class="fg"><label>Bonus (USD)</label><input id="f-bon" type="number" min="0" step="500" placeholder="e.g. 8000"/></div>
+      </div>
+      <div class="form-foot">
+        <button class="btn" id="sub-btn" onclick="addEmployee()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add Employee
+        </button>
+        <div class="toast" id="toast"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>PayCore v1.0 · Flask + PostgreSQL + Vanilla JS</span>
+    <span>Built for Interview Showcase</span>
+  </footer>
+</div>
+
+<script>
+const API='http://localhost:5000';
+const $=id=>document.getElementById(id);
+const usd=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+
+function stateRow(id,cols,msg,isErr){
+  $(id).innerHTML=`<tr class="state"><td colspan="${cols}">${isErr?`<span class="err">⚠ ${msg}</span>`:`<span class="spin"></span>${msg}`}</td></tr>`;
+}
+
+async function loadDepts(){
+  try{
+    const r=await fetch(`${API}/api/departments/cost`);
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.message);
+    const data=j.data;
+    const total=data.reduce((s,d)=>s+d.total_cost,0);
+    const heads=data.reduce((s,d)=>s+d.headcount,0);
+    const avgS=data.reduce((s,d)=>s+d.avg_base_salary,0)/data.length;
+    $('k-total').textContent=usd(total);
+    $('k-depts').textContent=data.length;
+    $('k-heads').textContent=heads;
+    $('k-avg').textContent=usd(avgS);
+    const sel=$('f-dept');
+    data.forEach(d=>{
+      const o=document.createElement('option');
+      o.value=d.dept_id;o.textContent=d.department;sel.appendChild(o);
+    });
+    const tb=$('tb-dept');tb.innerHTML='';
+    data.forEach((d,i)=>{
+      const pct=((d.total_cost/total)*100).toFixed(1);
+      tb.insertAdjacentHTML('beforeend',`
+        <tr>
+          <td class="num muted">${String(i+1).padStart(2,'0')}</td>
+          <td><span class="tag tag-blue">${d.department}</span></td>
+          <td class="num">${d.headcount}</td>
+          <td class="num">${usd(d.avg_base_salary)}</td>
+          <td class="num" style="color:var(--text1);font-weight:600">${usd(d.total_cost)}</td>
+          <td>
+            <div class="bar-wrap">
+              <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+              <div class="bar-pct">${pct}%</div>
+            </div>
+          </td>
+        </tr>`);
+    });
+  }catch(e){stateRow('tb-dept',6,e.message,true)}
+}
+
+async function loadTop(){
+  try{
+    const r=await fetch(`${API}/api/employees/top-earners`);
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.message);
+    const tb=$('tb-top');tb.innerHTML='';
+    j.data.forEach((e,i)=>{
+      tb.insertAdjacentHTML('beforeend',`
+        <tr>
+          <td class="num"><span class="crown">★</span> ${String(i+1).padStart(2,'0')}</td>
+          <td style="font-weight:600;color:var(--text1)">${e.employee_name}</td>
+          <td><span class="tag tag-gray">${e.role}</span></td>
+          <td><span class="tag tag-blue">${e.department}</span></td>
+          <td class="num muted">${usd(e.base_salary)}</td>
+          <td class="num" style="color:var(--amber)">+${usd(e.bonus)}</td>
+          <td class="num green" style="font-weight:600">${usd(e.total_compensation)}</td>
+        </tr>`);
+    });
+  }catch(e){stateRow('tb-top',7,e.message,true)}
+}
+
+async function addEmployee(){
+  const name=$('f-name').value.trim();
+  const role=$('f-role').value.trim();
+  const dept=parseInt($('f-dept').value);
+  const sal=parseFloat($('f-sal').value);
+  const bon=parseFloat($('f-bon').value)||0;
+  if(!name||!role||!dept||isNaN(sal)){toast('All fields are required.','fail');return}
+  const btn=$('sub-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin"></span>Saving…';
+  try{
+    const r=await fetch(`${API}/api/employees/new`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,role,dept_id:dept,base_salary:sal,bonus:bon})
+    });
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.message);
+    toast(`✓ ${name} added — emp #${j.emp_id}`,'ok');
+    ['f-name','f-role','f-sal','f-bon'].forEach(id=>$(id).value='');
+    $('f-dept').value='';
+    stateRow('tb-dept',6,'Refreshing…');stateRow('tb-top',7,'Refreshing…');
+    await Promise.all([loadDepts(),loadTop()]);
+  }catch(e){toast('⚠ '+e.message,'fail')}
+  finally{
+    btn.disabled=false;
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Employee';
+  }
+}
+
+function toast(msg,type){
+  const t=$('toast');t.textContent=msg;t.className=`toast show ${type}`;
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+Promise.all([loadDepts(),loadTop()]);
+</script>
+</body>
+</html>
